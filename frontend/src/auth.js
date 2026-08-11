@@ -1,5 +1,9 @@
 import axios from 'axios'
 
+// Mesma regra do api.js: em dev cai no backend local; em produção usa
+// VITE_API_URL (configurada na Vercel).
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
+
 const CHAVE_TOKEN = 'historiador_ia_token'
 
 export function salvarToken(token) {
@@ -18,7 +22,7 @@ export async function login(email, senha) {
   const form = new URLSearchParams()
   form.append('username', email)
   form.append('password', senha)
-  const { data } = await axios.post('http://localhost:8000/api/auth/login', form, {
+  const { data } = await axios.post(`${API_BASE}/auth/login`, form, {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
   })
   salvarToken(data.access_token)
@@ -26,7 +30,7 @@ export async function login(email, senha) {
 }
 
 export async function registrar(nome, email, senha, escola) {
-  const { data } = await axios.post('http://localhost:8000/api/auth/registrar', {
+  const { data } = await axios.post(`${API_BASE}/auth/registrar`, {
     nome, email, senha, escola: escola || null,
   })
   return data
@@ -36,7 +40,7 @@ export async function obterProfessorAtual() {
   const token = obterToken()
   if (!token) return null
   try {
-    const { data } = await axios.get('http://localhost:8000/api/auth/eu', {
+    const { data } = await axios.get(`${API_BASE}/auth/eu`, {
       headers: { Authorization: `Bearer ${token}` },
     })
     return data
