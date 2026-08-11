@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: historiador-ia-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false   # cole aqui a connection string do Neon (ver DEPLOY.md)
+      - key: CORS_ORIGINS
+        sync: false
+
+# Sem bloco "disk": os arquivos originais enviados (rubrica, ficha modelo,
+# fichas dos alunos) só são lidos uma vez, na hora do upload, para extrair
+# o texto — e o texto extraído já fica salvo no banco (Postgres/Neon).
+# Por isso o disco do Render pode ser efêmero sem perda funcional; só o
+# banco de dados precisa ser persistente, e quem cuida disso é o Neon.
